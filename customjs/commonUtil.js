@@ -287,19 +287,12 @@ function simpleSaveBillLine()
 		loc_newBillLineObj['net'] 		= v_net;
 		loc_newBillLineObj['discPer']   = parseFloat(v_disc_per).toFixed(2);
 		
-		    
-  	    /*if (!g_itemNameList.includes(v_itemName))
-        {
-		    g_itemNameList.push(v_itemName);
-		    localStorage.setItem('itemNameList', g_itemNameList);
-		}*/
-		
 		//-------
 		for (let i = 0; i < g_newBillLine.length; i++) 
 		{
   			v_updated = 0;
   		
-    		if (g_newBillLine[i].itemId === v_itemId && g_newBillLine[i].price === v_price) 
+    		if (g_newBillLine[i].itemName === v_itemName && g_newBillLine[i].price === v_price) 
 			{
 			    
 		        g_newBillLine[i].qty 		= (Number(g_newBillLine[i].qty) + Number(v_qty));
