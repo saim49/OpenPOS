@@ -15,9 +15,9 @@
         $("#shop-detail").val(localStorage.getItem('shopDetail'));
         $("#itemName").focus();
         displayItems();
-        document.addEventListener("contextmenu", function (e){
+        /*document.addEventListener("contextmenu", function (e){
             e.preventDefault();
-        }, false); 
+        }, false);*/ 
         
         var inputs = $(':input').keypress(function (e) {
              if (e.which == 13) {
@@ -67,7 +67,6 @@
                 // Set the selected item’s label in the input field
                 $('#itemName').val(ui.item.name);
                 $('#price').val(ui.item.price);
-                $('#price').prop('readonly', true);
                 simpleBillLineNet();
                 $('#qty').focus();
                 return false;
@@ -115,6 +114,7 @@
 						  <td><center>${item.name}</center></td>
 						  <td><center>${item.price}/-</center></td>
 						  <td><center>${item.disc}%</center></td>
+              <td><center>${item.barcode}</center></td>
 						  <td>
 							  <button class="btn btn-warning btn-sm" onclick="editItem('${item.id}')">Edit</button>
 							  <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">Delete</button>
@@ -128,9 +128,10 @@
 	let currentEditId = null;
 
 	function saveNewItem() {
-		const itemName = document.getElementById('itemDetail').value.trim();
-		const itemPrice = document.getElementById('itemPrice').value;
-		const itemDiscount = document.getElementById('itemDiscount').value;
+		const itemName      = document.getElementById('itemDetail').value.trim();
+		const itemPrice     = document.getElementById('itemPrice').value;
+		const itemDiscount  = document.getElementById('itemDiscount').value;
+    const itemBarcode   = document.getElementById('itemBarcode').value;
 
 		if (!itemName || !itemPrice) {
 			alert('Please fill out all required fields.');
@@ -141,10 +142,15 @@
 
 		// Check if the item already exists (by name)
 		const duplicateItem = items.find(item => item.name.toLowerCase() === itemName.toLowerCase() && item.id !== currentEditId);
-
+    const duplicateBarcode = items.find(item => item.barcode.toLowerCase() === itemBarcode.toLowerCase() && item.id !== currentEditId);
 		if (duplicateItem) {
 			alert('Item with the same name already exists!');
 			return; // Don't allow the duplicate item to be added
+		}
+
+    if (duplicateBarcode && itemBarcode.toLowerCase()) {
+			alert('Barcode already exists!');
+			return; // Don't allow the duplicate barcode to be added
 		}
 
 		if (currentEditId) {
@@ -152,10 +158,11 @@
 			items = items.map(item => {
 				if (item.id === currentEditId) {
 					return {
-						id: item.id,
-						name: itemName,
-						price: itemPrice,
-						disc: itemDiscount || "0.00"
+						id      : item.id,
+						name    : itemName,
+            barcode : itemBarcode,
+						price   : itemPrice,
+						disc    : itemDiscount || "0.00"
 					};
 				}
 				return item;
@@ -165,10 +172,11 @@
 		} else {
 			// Add new item
 			const newItem = {
-				id: items.length ? (parseInt(items[items.length - 1].id) + 1).toString() : '1',
-				name: itemName,
-				price: itemPrice,
-				disc: itemDiscount || "0.00"
+				id      : items.length ? (parseInt(items[items.length - 1].id) + 1).toString() : '1',
+				name    : itemName,
+				price   : itemPrice,
+				disc    : itemDiscount || "0.00",
+        barcode : itemBarcode
 			};
 
 			items.push(newItem);
@@ -192,6 +200,7 @@
 			document.getElementById('itemDetail').value = itemToEdit.name;
 			document.getElementById('itemPrice').value = itemToEdit.price;
 			document.getElementById('itemDiscount').value = itemToEdit.disc;
+      document.getElementById('itemBarcode').value = itemToEdit.barcode;
 
 			// Set the current edit ID
 			currentEditId = itemToEdit.id;
@@ -211,8 +220,28 @@
 	}
 
 
-	
-	
+  function searchItemsBarcode() {
+    var filter = $('#itemName').val();
+		if (filter)
+    {
+      let items = JSON.parse(localStorage.getItem('items')) || [];
+      
+			filter = filter.toLowerCase();
+			items = items.filter(item => item.barcode.toLowerCase().includes(filter));
+      items.forEach(item => {
+        if (item.barcode)
+        {
+          $('#itemName').val(item.name);
+          $('#price').val(item.price);
+          simpleBillLineNet();
+          $('#qty').val(1);
+          $('#disc').val(0);
+          simpleSaveBillLine();
+        }
+		  });
+    }
+	}
+
     function startTimer() {
         idleTime = idleTime + 1;
     
@@ -222,7 +251,9 @@
         }
     }
 	
-
+    function refreshPage() {
+      location.reload();  // This will refresh the page
+    }
 
     function resetTimer() {
         idleTime = 0; 
@@ -512,9 +543,6 @@
         </svg>
           About Us
       </button>
-	  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
-		Add New Item
-	 </button>
     </div>
     <marquee class="bg-success text-white"><b> Atta Son's (SaimTech)</b> Empowering businesses with simple, intuitive, and free POS solutions. At Atta Son's (SaimTech), we understand the challenges that business owners face daily. That's why we've developed a robust POS system designed to streamline your processes, enhance your customer service, and boost your sales—all without the hefty price tag. Our software is tailored to meet the unique needs of various industries, from retail stores and restaurants to service providers and beyond.</marquee>
     <div class="row g-5 py-1 mx-2">
@@ -589,7 +617,7 @@
           </tr>
           <tr class="table-secondary">
             <td scope="row" colspan="2">
-                <input type="text"  placeholder="Enter item" class="form-control" id="itemName" tabindex="1">
+                <input type="text"  placeholder="Enter item" class="form-control" onkeyup="searchItemsBarcode()"; id="itemName" tabindex="1">
             </td>
             <td><input type="number" class="form-control" id="price" placeholder="Price" tabindex="2" onkeyup="simpleBillLineNet();"></td>
             <td><input type="number" class="form-control" id="qty" placeholder="Qty" tabindex="3" onkeyup="simpleBillLineNet();"></td>
@@ -705,7 +733,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="addItemModalLabel">Items</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button"  onclick="refreshPage()" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
 		<div class="row">
@@ -723,6 +751,10 @@
 					<label for="itemDiscount" class="form-label">Discount (%)</label>
 					<input type="number" class="form-control" id="itemDiscount" placeholder="Enter discount" value="0">
 				</div>
+        <div class="mb-3">
+					<label for="itemDiscount" class="form-label">Barcode</label>
+					<input type="text" class="form-control" id="itemBarcode" placeholder="Enter Barcode like 111098881" value="">
+				</div>
 				 <button type="button" class="btn btn-primary" onclick="saveNewItem()">Save Item</button>
 			</form>
 		</div>
@@ -739,6 +771,7 @@
 			<th>Name</th>
 			<th>Price</th>
 			<th>Discount</th>
+      <th>Barcode</th>
 			<th>Action</th>
 			</tr>
 			</thead>
