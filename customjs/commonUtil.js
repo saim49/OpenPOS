@@ -20,6 +20,72 @@ if (localStorage.getItem('itemNameList'))
 }
 
 
+function exportData()
+{
+	const jsonData = {
+		shopDetail		: localStorage.getItem('shopDetail') ? localStorage.getItem('shopDetail') : "A truely pakistani brand.",
+		shopName  		: localStorage.getItem('shopName') ? localStorage.getItem('shopName') : "Atta Son's (SaimTech)",
+		theme	  		: localStorage.getItem('shopDetail') ? localStorage.getItem('theme') : "dark",
+		items			: localStorage.getItem('items') ? localStorage.getItem('items') : null,
+		invoicesData 	: localStorage.getItem('invoicesData') ? localStorage.getItem('invoicesData') : null,
+		counterData		: localStorage.getItem('counterData') ? localStorage.getItem('counterData') : null,
+	  };
+	  
+	// Convert the JSON object to a string
+	const jsonString = JSON.stringify(jsonData);
+	
+	// Create a blob from the string
+	const blob = new Blob([jsonString], { type: "application/json" });
+
+	// Create a link element
+	const link = document.createElement("a");
+
+	// Create a URL for the blob and set it as the href attribute
+	link.href = URL.createObjectURL(blob);
+
+	// Set the download attribute with the file name
+	var datetime  = new Date().toLocaleString().replace(',','');
+	link.download = "openpos"+datetime+".saimtech";
+
+	// Programmatically click the link to trigger the download
+	link.click();
+
+	// Clean up by revoking the object URL
+	URL.revokeObjectURL(link.href);
+}
+
+function importData()
+{
+	const input = document.getElementById('jsonFileInput');
+
+	const file  = input.files[0];
+
+	if (file) {
+        const reader = new FileReader();
+
+        // Read the file as text
+        reader.readAsText(file);
+
+        // Handle the file once it's been read
+        reader.onload = function(event) {
+          const jsonData = JSON.parse(event.target.result); // Parse the JSON
+          console.log('Imported JSON data:', jsonData); // Do something with the data
+		  localStorage.setItem('shopDetail', jsonData.shopDetail);
+		  localStorage.setItem('shopName', jsonData.shopName);
+		  localStorage.setItem('items', jsonData.items);
+		  localStorage.setItem('invoicesData', jsonData.invoicesData);
+		  localStorage.setItem('theme', jsonData.theme);
+		  localStorage.setItem('counterData', jsonData.counterData);
+        };
+
+		// Handle any errors that occur during reading
+        reader.onerror = function() {
+			console.error('Error reading the file:', reader.error);
+			alert('Error reading the file:' + reader.error);
+		};
+	}	
+
+}
 
 function calActualDiscountAmount(_price,_qty,_discValue,_flag)
 {
