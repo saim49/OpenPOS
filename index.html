@@ -15,9 +15,10 @@
         $("#shop-detail").val(localStorage.getItem('shopDetail'));
         $("#itemName").focus();
         displayItems();
-        /*document.addEventListener("contextmenu", function (e){
+        
+        document.addEventListener("contextmenu", function (e){
             e.preventDefault();
-        }, false);*/ 
+        }, false); 
         
         var inputs = $(':input').keypress(function (e) {
              if (e.which == 13) {
@@ -273,7 +274,7 @@
         popup.classList.remove('show'); // Reset the slide-in animation
     }
 
-    setInterval(startTimer, 3000); // 60000 ms = 1 minute
+    setInterval(startTimer, 9000); // 60000 ms = 1 minute
     
 
   </script>
@@ -504,34 +505,11 @@
 <div >
   <main>
     <div class="d-flex gap-2 justify-content-center py-2 bg-black border border-success-subtle">
-      <button class="btn btn-success rounded-pill px-3" type="button" onclick="openPOS()">
-        <svg xmlns="icons/receipt-cutoff.svg" width="16" height="16" fill="currentColor" class="bi bi-receipt-cutoff" viewBox="0 0 16 16">
-          <path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5M11.5 4a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
-          <path d="M2.354.646a.5.5 0 0 0-.801.13l-.5 1A.5.5 0 0 0 1 2v13H.5a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1H15V2a.5.5 0 0 0-.053-.224l-.5-1a.5.5 0 0 0-.8-.13L13 1.293l-.646-.647a.5.5 0 0 0-.708 0L11 1.293l-.646-.647a.5.5 0 0 0-.708 0L9 1.293 8.354.646a.5.5 0 0 0-.708 0L7 1.293 6.354.646a.5.5 0 0 0-.708 0L5 1.293 4.354.646a.5.5 0 0 0-.708 0L3 1.293zm-.217 1.198.51.51a.5.5 0 0 0 .707 0L4 1.707l.646.647a.5.5 0 0 0 .708 0L6 1.707l.646.647a.5.5 0 0 0 .708 0L8 1.707l.646.647a.5.5 0 0 0 .708 0L10 1.707l.646.647a.5.5 0 0 0 .708 0L12 1.707l.646.647a.5.5 0 0 0 .708 0l.509-.51.137.274V15H2V2.118z"/>
-        </svg>
-        New bill windows
-      </button>
-      <button class="btn btn-warning rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#reportModel">
-        <svg xmlns="icons/receipt-cutoff.svg" width="16" height="16" fill="currentColor" class="bi bi-receipt-cutoff" viewBox="0 0 16 16">
-          <path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5M11.5 4a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
-          <path d="M2.354.646a.5.5 0 0 0-.801.13l-.5 1A.5.5 0 0 0 1 2v13H.5a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1H15V2a.5.5 0 0 0-.053-.224l-.5-1a.5.5 0 0 0-.8-.13L13 1.293l-.646-.647a.5.5 0 0 0-.708 0L11 1.293l-.646-.647a.5.5 0 0 0-.708 0L9 1.293 8.354.646a.5.5 0 0 0-.708 0L7 1.293 6.354.646a.5.5 0 0 0-.708 0L5 1.293 4.354.646a.5.5 0 0 0-.708 0L3 1.293zm-.217 1.198.51.51a.5.5 0 0 0 .707 0L4 1.707l.646.647a.5.5 0 0 0 .708 0L6 1.707l.646.647a.5.5 0 0 0 .708 0L8 1.707l.646.647a.5.5 0 0 0 .708 0L10 1.707l.646.647a.5.5 0 0 0 .708 0L12 1.707l.646.647a.5.5 0 0 0 .708 0l.509-.51.137.274V15H2V2.118z"/>
-        </svg>
-          Sale report
-      </button>
-      <button class="btn btn-danger rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#dbSyncModel" onclick="getInvoiceCount();">
-      <svg xmlns="icons/question-square.svg" width="16" height="16" fill="currentColor" class="bi bi-question-square" viewBox="0 0 16 16">
-          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-          <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
-        </svg>
-          Settings
-      </button>
-      <button class="btn btn-info rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#aboutModel">
-      <svg xmlns="icons/question-square.svg" width="16" height="16" fill="currentColor" class="bi bi-question-square" viewBox="0 0 16 16">
-          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-          <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
-        </svg>
-          About Us
-      </button>
+      <button class="btn btn-success rounded-pill px-3" type="button" onclick="openPOS()">New bill windows</button>
+      <button class="btn btn-primary rounded-pill px-3" type="button"  onclick="location.reload();">Refresh POS</button>
+      <button class="btn btn-warning rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#reportModel">Daily sale report</button>
+      <button class="btn btn-danger rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#dbSyncModel">System Settings</button>
+      <button class="btn btn-info rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#aboutModel">About Us</button>
     </div>
     <marquee class="bg-success text-white"><b> Atta Son's (SaimTech)</b> Empowering businesses with simple, intuitive, and free POS solutions. At Atta Son's (SaimTech), we understand the challenges that business owners face daily. That's why we've developed a robust POS system designed to streamline your processes, enhance your customer service, and boost your sales—all without the hefty price tag. Our software is tailored to meet the unique needs of various industries, from retail stores and restaurants to service providers and beyond.</marquee>
     <div class="row g-5 py-1 mx-2">
@@ -606,7 +584,7 @@
           </tr>
           <tr class="table-secondary">
             <td scope="row" colspan="2">
-                <input type="text"  placeholder="Enter item" class="form-control" onkeyup="searchItemsBarcode()"; id="itemName" tabindex="1">
+                <input type="text"  placeholder="Enter item" class="form-control" onkeyup="searchItemsBarcode()"; onblur="searchItemsBarcode()" id="itemName" tabindex="1">
             </td>
             <td><input type="number" class="form-control" id="price" placeholder="Price" tabindex="2" onkeyup="simpleBillLineNet();"></td>
             <td><input type="number" class="form-control" id="qty" placeholder="Qty" tabindex="3" onkeyup="simpleBillLineNet();"></td>
@@ -764,6 +742,33 @@
             <div class="tab-pane ms-2 fade" id="v-pills-export" role="tabpanel" aria-labelledby="v-pills-export-tab" tabindex="0">
             <h2>Export your data <mark>(Paid Feature)</mark> :</h2>
             <p>Please export your valuable data and save your performance, available through this paid feature.            </p>
+            <form id="exportForm">
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="items" id="exportItems">
+                  <label class="form-check-label" for="exportItems">
+                      Items
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="invoices" id="exportInvoices">
+                  <label class="form-check-label" for="exportInvoices">
+                      Invoices
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="print-settings" id="exportPrintSettings">
+                  <label class="form-check-label" for="exportPrintSettings">
+                      Print Settings
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="system-settings" id="exportSystemSettings">
+                  <label class="form-check-label" for="exportSystemSettings">
+                      System Settings
+                  </label>
+              </div>
+          </form>
+          
             <p>Click here to export
             <button class="btn btn-success btn-md" onclick="exportData()">Export Data</button></p>
             </div>

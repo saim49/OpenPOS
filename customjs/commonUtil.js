@@ -22,15 +22,26 @@ if (localStorage.getItem('itemNameList'))
 
 function exportData()
 {
-	const jsonData = {
-		shopDetail		: localStorage.getItem('shopDetail') ? localStorage.getItem('shopDetail') : "A truely pakistani brand.",
-		shopName  		: localStorage.getItem('shopName') ? localStorage.getItem('shopName') : "Atta Son's (SaimTech)",
-		theme	  		: localStorage.getItem('shopDetail') ? localStorage.getItem('theme') : "dark",
-		items			: localStorage.getItem('items') ? localStorage.getItem('items') : null,
-		invoicesData 	: localStorage.getItem('invoicesData') ? localStorage.getItem('invoicesData') : null,
-		counterData		: localStorage.getItem('counterData') ? localStorage.getItem('counterData') : null,
-	  };
-	  
+	var jsonData = {};
+	
+	if (document.getElementById('exportItems').checked) {
+		jsonData['items'] = localStorage.getItem('items') ? localStorage.getItem('items') : null;
+	}
+
+	if (document.getElementById('exportInvoices').checked) {
+		jsonData['invoicesData'] = localStorage.getItem('invoicesData') ? localStorage.getItem('invoicesData') : null;
+	}
+
+	if (document.getElementById('exportPrintSettings').checked) {
+		jsonData['shopDetail'] = localStorage.getItem('shopDetail') ? localStorage.getItem('shopDetail') : null;
+		jsonData['shopName'] = localStorage.getItem('shopName') ? localStorage.getItem('shopName') : "Atta Son's (SaimTech)";
+	}
+
+	if (document.getElementById('exportSystemSettings').checked) {
+		jsonData['theme'] = localStorage.getItem('theme') ? localStorage.getItem('theme') : "dark";
+		jsonData['counterData'] = localStorage.getItem('counterData') ? localStorage.getItem('counterData') : null;
+	}
+  
 	// Convert the JSON object to a string
 	const jsonString = JSON.stringify(jsonData);
 	
@@ -68,14 +79,34 @@ function importData()
 
         // Handle the file once it's been read
         reader.onload = function(event) {
-          const jsonData = JSON.parse(event.target.result); // Parse the JSON
-          console.log('Imported JSON data:', jsonData); // Do something with the data
-		  localStorage.setItem('shopDetail', jsonData.shopDetail);
-		  localStorage.setItem('shopName', jsonData.shopName);
-		  localStorage.setItem('items', jsonData.items);
-		  localStorage.setItem('invoicesData', jsonData.invoicesData);
-		  localStorage.setItem('theme', jsonData.theme);
-		  localStorage.setItem('counterData', jsonData.counterData);
+        const jsonData = JSON.parse(event.target.result); // Parse the JSON
+        
+		if (jsonData.hasOwnProperty('shopDetail') && jsonData.shopDetail !== undefined) {
+			localStorage.setItem('shopDetail', sonData.shopDetail); // Use JSON.stringify if it's an object or array
+		}
+		
+		if (jsonData.hasOwnProperty('shopName') && jsonData.shopName !== undefined) {
+			localStorage.setItem('shopName', jsonData.shopName); // Assuming it's a string
+		}
+		
+		if (jsonData.hasOwnProperty('items') && jsonData.items !== undefined) {
+			localStorage.setItem('items', jsonData.items); // Use JSON.stringify for objects or arrays
+		}
+		
+		if (jsonData.hasOwnProperty('invoicesData') && jsonData.invoicesData !== undefined) {
+			localStorage.setItem('invoicesData', jsonData.invoicesData); // Use JSON.stringify for objects or arrays
+		}
+		
+		if (jsonData.hasOwnProperty('theme') && jsonData.theme !== undefined) {
+			localStorage.setItem('theme', jsonData.theme); // Assuming it's a string
+		}
+		
+		if (jsonData.hasOwnProperty('counterData') && jsonData.counterData !== undefined) {
+			localStorage.setItem('counterData', jsonData.counterData); // Use JSON.stringify for objects or arrays
+		}
+
+		alert("File imported successfully.");
+
         };
 
 		// Handle any errors that occur during reading
@@ -84,7 +115,6 @@ function importData()
 			alert('Error reading the file:' + reader.error);
 		};
 	}	
-
 }
 
 function calActualDiscountAmount(_price,_qty,_discValue,_flag)
