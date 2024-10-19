@@ -223,6 +223,7 @@
 
   function searchItemsBarcode() {
     var filter = $('#itemName').val();
+    const qty = 1;
 		if (filter)
     {
       let items = JSON.parse(localStorage.getItem('items')) || [];
@@ -235,7 +236,7 @@
           $('#itemName').val(item.name);
           $('#price').val(item.price);
           simpleBillLineNet();
-          $('#qty').val(1);
+          $('#qty').val(qty);
           $('#disc').val(0);
           simpleSaveBillLine();
         }
