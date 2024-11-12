@@ -32,6 +32,11 @@
       font-size: 10px;
     }
 
+    .font-total
+    {
+      font-size: 11px;
+    }
+
     .font-sm
     {
       padding-left: 2px;
@@ -100,15 +105,16 @@
                   v_html += "<tr class='font'  style='border-bottom: 1px solid'>";
                   v_html += "<td><center>"+v_rowNum+"</center></td>";
                   v_html += "<td class='font-sm'>"+rows.itemName+"</center></td>";
-                  v_html += "<td class='font-sm amount'>"+formatNumberWithCommas(rows.price)+"</center></td>";
                   v_html += "<td><center>"+rows.qty+"</center></td>";
-                  v_html += "<td style='border-left: 1px solid' class='amount'>"+formatNumberWithCommas(Number(rows.qty) * Number(rows.price))+"</td>";
+                  v_html += "<td class='font-sm amount'>"+formatNumberWithCommas(rows.price)+"</center></td>";
+                  v_html += "<td><center>"+rows.disc+"</center></td>";
+                  v_html += "<td style='border-left: 1px solid' class='amount'>"+formatNumberWithCommas((Number(rows.qty) * Number(rows.price)) - Number(rows.disc))+"</td>";
                   v_html += "</tr>";
     
               });
               $("#bill-table-body").html(v_html);
-			    window.print();
-				window.close();
+			        window.print();
+				      window.close();
               break;
             }
         }
@@ -149,11 +155,12 @@
     <table width="99%" id="bill-table">
       <thead>
       <tr style='border-bottom: 2px solid'>
-        <th class="font" width="8%">S#</th>
-        <td class="font" width="50%"><b>Item</b></td>
-        <th class="font" width="15%">Rate</th>
+        <th class="font" width="6%">S#</th>
+        <td class="font" width="40%"><b>Item</b></td>
         <th class="font" width="10%">Qty</th>
-        <th class="font" width="18%">Total</th>
+        <th class="font" width="13%">Rate</th>
+        <th class="font" width="16%">Disc.</th>
+        <th class="font" width="16%">Total</th>
       </tr>
       </thead>
       <tbody  id="bill-table-body">
@@ -163,6 +170,7 @@
 		      <th></th>
           <td><b>Total amount</b></td>
           <th></th>
+          <th></th>
 		      <th></th>
           <th id="total-amount" class='amount' style="border-left: 1px solid"><center></center></th>
         </tr>
@@ -171,6 +179,7 @@
 		      <td><b>Total discount</b></td>
           <th></th>
 		      <th></th>
+          <th></th>
           <th id="discount-amount" class='amount' style="border-left: 1px solid"><center></center></th>
         </tr>
         <tr class="font">
@@ -179,7 +188,8 @@
           <td><b>Net amount to be paid</b></td>
           <th></th>
 		      <th></th>
-          <th id="net-amount" class='amount' style="border-left: 1px solid"><center></center></th>
+          <th></th>
+          <th id="net-amount" class='amount font-total' style="border-left: 1px solid"><center></center></th>
         </tr>
       </tfoot>
     </table>
