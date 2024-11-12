@@ -17,7 +17,7 @@
 
     .nopm
     {
-        padding: 1 1 1 1px;
+        padding: 1 0 1 1px;
         margin: 0 0 1 1px;
     }
     
@@ -29,7 +29,7 @@
     
     .font
     {
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .font-sm
@@ -40,13 +40,20 @@
 
     .element {
       padding-right: 0px;
-      padding-left: 50px;
-}
+	}
+	
+	.amount {
+		text-align: right;
+	}
   </style>
 </head>
 <script>
   $( document ).ready(function(){
      
+    function formatNumberWithCommas(number) {
+      return  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");;
+    }
+
     const searchParams  = new URLSearchParams(window.location.search);
     const d             = new Date().toLocaleString().replace(',','');
     const invoice       = searchParams.get('invoice');
@@ -73,15 +80,15 @@
 		{
             if (innerArrayData[i].invoice_code == invoice) 
 			{
-              $('#total-amount').text(innerArrayData[i].invoice_total+"/-"); 
-              $('#discount-amount').text(innerArrayData[i].invoice_discount+"/-"); 
-              $('#net-amount').text(innerArrayData[i].invoice_net+"/-"); 
-    		  $('#paym-span').text(innerArrayData[i].payment_mode); 
-    		  $('#customer-span').text(innerArrayData[i].customer);
-    		  $('#date-span').text(d);
-    		  $('#shop-name-span').text(shopName);
-    		  $('#shop-detail-span').text(shopDetail);
-    		  
+              $('#total-amount').text(formatNumberWithCommas(innerArrayData[i].invoice_total)); 
+              $('#discount-amount').text(formatNumberWithCommas(innerArrayData[i].invoice_discount)); 
+              $('#net-amount').text(formatNumberWithCommas(innerArrayData[i].invoice_net)); 
+    		      $('#paym-span').text(innerArrayData[i].payment_mode); 
+              $('#customer-span').text(innerArrayData[i].customer);
+              $('#date-span').text(d);
+              $('#shop-name-span').text(shopName);
+              $('#shop-detail-span').text(shopDetail);
+              
               var v_cell1,v_cell2,v_cell3,v_cell4,v_row,v_rowNum, 
               v_table;
               //-------
@@ -90,12 +97,12 @@
               //-------
               $.each(innerArrayData[i].invoice_lines, function(j, rows) {
     	            v_rowNum 		= j+1;
-                  v_html += "<tr class='font'>";
+                  v_html += "<tr class='font'  style='border-bottom: 1px solid'>";
                   v_html += "<td><center>"+v_rowNum+"</center></td>";
                   v_html += "<td class='font-sm'>"+rows.itemName+"</center></td>";
-                  v_html += "<td class='font-sm'>"+rows.price+"</center></td>";
+                  v_html += "<td class='font-sm amount'>"+formatNumberWithCommas(rows.price)+"</center></td>";
                   v_html += "<td><center>"+rows.qty+"</center></td>";
-                  v_html += "<td><center>"+Number(rows.qty) * Number(rows.price)+"/-</td>";
+                  v_html += "<td style='border-left: 1px solid' class='amount'>"+formatNumberWithCommas(Number(rows.qty) * Number(rows.price))+"</td>";
                   v_html += "</tr>";
     
               });
@@ -118,34 +125,61 @@
         <p class="nopmh font" id="shop-detail-span"> </p>
     </center>
     <hr>
-    <p class="nopm font"><b> Invoice number#:</b> <span id="invoice-span"></span></p>
-    <p class="nopm font"><b> Date time:</b> <span id="date-span"></span></p>
-    <p class="nopm font"><b> Payment mode:</b> <span id="paym-span"></span></p>
-    <p class="nopm font"><b> Customer detail:</b> <span id="customer-span"></span></p>
-    <table border="1" width="99%" id="bill-table">
+    <table width="99%">
       <thead>
       <tr>
-        <th class="font" width="8%">Sr</th>
-        <th class="font" width="50%">Item</th>
-        <th class="font" width="15%">Amt</th>
+        <td class="font" width="40%"><b>Invoice number</b></td>
+        <td class="font" width="60%"><span id="invoice-span"></span></td>
+      </tr>
+      <tr>
+        <td class="font" width="40%"><b>Date & time</b></td>
+        <td class="font" width="60%"><span id="date-span"></span></td>
+      </tr>
+      <tr>
+        <td class="font" width="40%"><b>Payment mode</b></td>
+        <td class="font" width="60%"><span id="paym-span"></span></td>
+      </tr>
+      <tr>
+        <td class="font" width="40%"><b>Customer detail</b></td>
+        <td class="font" width="60%"><span id="customer-span"></span></td>
+      </tr>
+      </thead>
+    </table>
+    <br>
+    <table width="99%" id="bill-table">
+      <thead>
+      <tr style='border-bottom: 2px solid'>
+        <th class="font" width="8%">S#</th>
+        <td class="font" width="50%"><b>Item</b></td>
+        <th class="font" width="15%">Rate</th>
         <th class="font" width="10%">Qty</th>
         <th class="font" width="18%">Total</th>
       </tr>
       </thead>
       <tbody  id="bill-table-body">
       </tbody>
-      <tfoot>
+      <tfoot style='border-bottom: 2px solid'>
         <tr class="font">
-          <th colspan="4" class="element">Total</th>
-          <th id="total-amount"><center></center></th>
+		      <th></th>
+          <td><b>Total amount</b></td>
+          <th></th>
+		      <th></th>
+          <th id="total-amount" class='amount' style="border-left: 1px solid"><center></center></th>
         </tr>
         <tr class="font">
-          <th colspan="4" class="element">Discount</th>
-          <th id="discount-amount"><center></center></th>
+          <th></th>
+		      <td><b>Total discount</b></td>
+          <th></th>
+		      <th></th>
+          <th id="discount-amount" class='amount' style="border-left: 1px solid"><center></center></th>
         </tr>
         <tr class="font">
-          <th colspan="4" class="element">Net</th>
-          <th id="net-amount"><center></center></th>
+		  <th></th>
+		      
+          <td><b>Net amount to be paid</b></td>
+          <th></th>
+		      <th></th>
+          <th id="net-amount" class='amount' style="border-left: 1px solid"><center></center></th>
         </tr>
       </tfoot>
     </table>

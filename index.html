@@ -18,7 +18,7 @@
         
         document.addEventListener("contextmenu", function (e){
             e.preventDefault();
-        }, false);  
+        }, false); 
         
         var inputs = $(':input').keypress(function (e) {
              if (e.which == 13) {
@@ -92,6 +92,9 @@
     document.onclick = resetTimer;
     document.onscroll = resetTimer;
 	
+    function formatNumberWithCommas(number) {
+      return  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");;
+    }
 	function displayItems(filter = '') {
 		let items = JSON.parse(localStorage.getItem('items')) || [];
 		let itemTable = document.getElementById('itemTableBody');
@@ -113,9 +116,9 @@
 			let row = `<tr>
 						  <td><center>${item.id}</center></td>
 						  <td><center>${item.name}</center></td>
-						  <td><center>${item.price}/-</center></td>
+						  <td class='amount'>${formatNumberWithCommas(Number(item.price))}</td>
 						  <td><center>${item.disc}%</center></td>
-              <td><center>${item.barcode}</center></td>
+						  <td><center>${item.barcode}</center></td>
 						  <td>
 							  <button class="btn btn-success btn-sm" onclick="editItem('${item.id}')">Edit</button>
 							  <button class="btn btn-success btn-sm" onclick="deleteItem('${item.id}')">Delete</button>
@@ -348,6 +351,10 @@
         box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
       }
 
+      .amount {
+            text-align: right;
+        }
+
       .b-example-vr {
         flex-shrink: 0;
         width: 1.5rem;
@@ -466,7 +473,7 @@
       </symbol>
     </svg>
     <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
-      <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
+      <button style="background-color: #1b4332;" class="btn text-white py-2 dropdown-toggle d-flex align-items-center"
               id="bd-theme"
               type="button"
               aria-expanded="false"
@@ -491,7 +498,7 @@
           </button>
         </li>
         <li>
-          <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="true">
             <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#circle-half"></use></svg>
             Auto
             <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
@@ -503,14 +510,14 @@
     
 <div >
   <main>
-    <div class="d-flex gap-2 justify-content-center py-2 bg-black border border-success-subtle">
-      <button class="btn btn-success rounded-pill px-3" type="button" onclick="openPOS()">New bill windows</button>
-      <button class="btn btn-primary rounded-pill px-3" type="button"  onclick="location.reload();">Refresh POS</button>
-      <button class="btn btn-warning rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#reportModel">Daily sale report</button>
-      <button class="btn btn-danger rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#dbSyncModel">System Settings</button>
-      <button class="btn btn-info rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#aboutModel">About Us</button>
+    <div class="d-flex gap-2 justify-content-center py-2" style="background-color: #081c15">
+      <button class="btn rounded-pill text-white px-3" type="button" onclick="openPOS()" style="background-color: #2d6a4f">New bill windows</button>
+      <button class="btn text-white rounded-pill px-3" type="button"  onclick="location.reload();" style="background-color: #40916c">Refresh POS</button>
+      <button class="btn text-white rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#reportModel" style="background-color: #52b788">Daily sale report</button>
+      <button class="btn text-white rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#dbSyncModel" style="background-color: #2d6a4f">System Settings</button>
+      <button class="btn text-white rounded-pill px-3" type="button"  data-bs-toggle="modal" data-bs-target="#aboutModel" style="background-color: #40916c">About Us</button>
     </div>
-    <marquee class="bg-success text-white"><b> Atta Son's (SaimTech)</b> Empowering businesses with simple, intuitive, and free POS solutions. At Atta Son's (SaimTech), we understand the challenges that business owners face daily. That's why we've developed a robust POS system designed to streamline your processes, enhance your customer service, and boost your sales—all without the hefty price tag. Our software is tailored to meet the unique needs of various industries, from retail stores and restaurants to service providers and beyond.</marquee>
+    <marquee class="text-white" style="background-color: #1b4332;"><b> Atta Son's (SaimTech)</b> Empowering businesses with simple, intuitive, and free POS solutions. At Atta Son's (SaimTech), we understand the challenges that business owners face daily. That's why we've developed a robust POS system designed to streamline your processes, enhance your customer service, and boost your sales—all without the hefty price tag. Our software is tailored to meet the unique needs of various industries, from retail stores and restaurants to service providers and beyond.</marquee>
     <div class="row g-5 py-1 mx-2">
       <div class="col-md-4 col-lg-3 order-md-last  py-1">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -534,7 +541,7 @@
             <span class="text-success" id="li-discount-amount">0</span>
           </li>
           <li class="list-group-item d-flex justify-content-between fs-4">
-            <span>Net </span>
+            <span>Net Amount</span>
             <strong><mark id='li-net-amount'>0</mark>/-</strong>
           </li>
           <li class="list-group-item d-flex justify-content-between bg-body-tertiary"></li>
@@ -581,7 +588,7 @@
             <th scope="col" width="12%">Net</th>
             <th scope="col" width="5%">Action</th>
           </tr>
-          <tr class="table-secondary">
+          <tr class="table-success">
             <td scope="row" colspan="2">
                 <input type="text"  placeholder="Enter item" class="form-control"  onblur="searchItemsBarcode()" id="itemName" tabindex="1">
             </td>
@@ -681,10 +688,10 @@
         <p>In this section, configure system-wide settings, including display options, storage preferences, and backup schedules.</p>
         <div class="d-flex align-items-start">
           <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <button class="nav-link border-bottom active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-item" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Item settting</button>
-            <button class="nav-link border-bottom" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-print-settings" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Print setting</button>
-            <button class="nav-link border-bottom" id="v-pills-export-tab" data-bs-toggle="pill" data-bs-target="#v-pills-export" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Export setting</button>
-            <button class="nav-link border-bottom" id="v-pills-import-tab" data-bs-toggle="pill" data-bs-target="#v-pills-import" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Import setting</button>
+            <button style="background-color:#1b4332;" class="text-white nav-link border-bottom active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-item" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Item settting</button>
+            <button style="background-color:#1b4332;" class="text-white nav-link border-bottom" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-print-settings" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Print setting</button>
+            <button style="background-color:#1b4332;" class="text-white nav-link border-bottom" id="v-pills-export-tab" data-bs-toggle="pill" data-bs-target="#v-pills-export" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Export setting</button>
+            <button style="background-color:#1b4332;" class="text-white nav-link border-bottom" id="v-pills-import-tab" data-bs-toggle="pill" data-bs-target="#v-pills-import" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Import setting</button>
             
           </div>
           <div class="tab-content border-start" id="v-pills-tabContent">
@@ -718,15 +725,15 @@
                   <input type="text" class="form-control" id="searchItem" placeholder="Search by name or ID" onkeyup="searchItems()">
                   </div>
                   <div class="table-responsive">
-                  <table class="table table-bordered table-striped">
+                  <table class="table  table-bordered table-striped">
                   <thead>
                   <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Discount</th>
-                  <th>Barcode</th>
-                  <th>Action</th>
+                  <th><center>S#</center></th>
+                  <th><center>Name</center></th>
+                  <th><center>Price</center></th>
+                  <th><center>Discount</center></th>
+                  <th><center>Barcode</center></th>
+                  <th><center>Action</center></th>
                   </tr>
                   </thead>
                   <tbody id="itemTableBody">
