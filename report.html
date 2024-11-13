@@ -4,116 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Table</title>
-    <link rel="stylesheet" href="css/css@3.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/css@3.css">
     <link href="css/sweet-alert.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Favicons -->
     <meta name="theme-color" content="#712cf9">
-    <link rel="stylesheet" href="css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/all.min.css">
 
     <style>
-        .table2 {
-            width: 90%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin: 2px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-            font-size: 12px;
-        }
-        th {
-           
-        }
-        .amount {
-            text-align: right;
-        }
-        .invoice-group-header {
-            background-color: #d8f3dc; /* Darker blue for group header */
-            color: #333232; /* White text for contrast */
-            font-weight: bold;
-        }
-        .invoice-summary {
-            font-weight: bold;
-            background-color: #b7e4c7; /* Light yellow for total row */
-            color: #333333; /* Dark text for contrast */
-        }
+        .table2 { width: 90%; border-collapse: collapse; font-size: 12px; margin: 2px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; font-size: 12px; }
+        .amount { text-align: right; }
+        .invoice-group-header { background-color: #d8f3dc; font-weight: bold; }
+        .invoice-summary { font-weight: bold; background-color: #b7e4c7; }
+        .btn { margin: 8px; }
     </style>
     <script src="customjs/html2excel.js"></script>
 </head>
 <body>
 <div class="table-responsive">
     <center>
-    <button class="btn btn-success btn-sm mt-1 ml-6 mb-1" onclick="exportToExcel('invoiceTable', 'invoice_data')">Export sales report data into excel</button>
-    <table id="invoiceTable" class="table2">
-        <thead>
-            <tr>
-                <th width="12%">Invoice Code</th>
-                <th width="17%">Date & Time</th>
-                <th width="8%">Payment</th>
-                <th width="7%">Customer</th>
-                <th width="17%">Product</th>
-                <th width="8%">Price</th>
-                <th width="7%">Quantity</th>
-                <th width="7%">Discount</th>
-                <th width="7%">Net</th>
-            </tr>
-        </thead>
-        <tbody id="invoiceTableBody">
-        </tbody>
-    </table>
+        <div>
+            <label for="startDate">Start Date: </label>
+            <input type="date" id="startDate" onchange="filterInvoices()">
+            <label for="endDate">End Date: </label>
+            <input type="date" id="endDate" onchange="filterInvoices()">
+        </div>
+        <br>
+        <button class="btn btn-success btn-sm" onclick="exportFilteredToExcel()">Export Filtered Data to Excel</button>
+
+        <table id="invoiceTable" class="table2">
+            <thead>
+                <tr>
+                    <th width="12%">Invoice Code</th>
+                    <th width="17%">Date & Time</th>
+                    <th width="8%">Payment</th>
+                    <th width="7%">Customer</th>
+                    <th width="17%">Product</th>
+                    <th width="8%">Price</th>
+                    <th width="7%">Quantity</th>
+                    <th width="7%">Discount</th>
+                    <th width="7%">Net</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceTableBody">
+            </tbody>
+        </table>
     </center>
 </div>
 
 <script>
     function formatNumberWithCommas(number) {
-        number = parseInt(number, 10); // Remove leading zeros
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parseInt(number, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     function formatDateTime(dateString) {
         const date = new Date(dateString);
         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-        return date.toLocaleDateString('en-GB', options).replace(',', ''); // Format: DD-MM-YYYY HH:MM
+        return date.toLocaleDateString('en-GB', options).replace(',', '');
     }
 
     const invoicesData = JSON.parse(localStorage.getItem('invoicesData')) || [];
-    const tableBody = document.getElementById('invoiceTableBody');
-    let lastInvoiceCode = null;
+    let filteredInvoices = [];
 
-    invoicesData.forEach(invoiceArray => {
-        invoiceArray.forEach(invoice => {
-            // Skip this invoice if the code is "NA"
-            if (invoice.invoice_code === "NA") {
-                return;
-            }
+    function filterInvoices() {
+        const startDate = new Date(document.getElementById('startDate').value);
+        const endDate = new Date(document.getElementById('endDate').value);
+        const tableBody = document.getElementById('invoiceTableBody');
+        tableBody.innerHTML = ''; // Clear the table
+        filteredInvoices = []; // Clear filtered invoices
 
-            let totalPrice = 0;
-            let totalQuantity = 0;
-            let totalDiscount = 0;
-            let totalNet = 0;
+        let lastInvoiceCode = null;
 
-            // Add a new group header row if the invoice code changes
-            if (invoice.invoice_code !== lastInvoiceCode) {
-                const groupHeaderRow = document.createElement('tr');
-                groupHeaderRow.classList.add('invoice-group-header');
-                groupHeaderRow.innerHTML = `
-                    <td colspan="9">Invoice Code: ${invoice.invoice_code}</td>
+        invoicesData.forEach(invoiceArray => {
+            invoiceArray.forEach(invoice => {
+                // Skip invoices with code "NA"
+                if (invoice.invoice_code === "NA") return;
+
+                const invoiceDate = new Date(invoice.invoice_date);
+
+                // Check if the invoice date is within the selected date range
+                if (
+                    (!isNaN(startDate) && invoiceDate < startDate) ||
+                    (!isNaN(endDate) && invoiceDate > endDate)
+                ) {
+                    return; // Skip invoices outside the date range
+                }
+
+                // Store the invoice in the filtered array
+                filteredInvoices.push(invoice);
+
+                let totalPrice = 0;
+                let totalQuantity = 0;
+                let totalDiscount = 0;
+                let totalNet = 0;
+
+                // Add a new group header row if the invoice code changes
+                if (invoice.invoice_code !== lastInvoiceCode) {
+                    const groupHeaderRow = document.createElement('tr');
+                    groupHeaderRow.classList.add('invoice-group-header');
+                    groupHeaderRow.innerHTML = `<td colspan="6">Invoice Code: ${invoice.invoice_code}</td>`;
+                    groupHeaderRow.innerHTML += `<td colspan="3"><a target='_blank' href='print.html?invoice=${invoice.invoice_code}' class='btn btn-success btn-sm'>Print Receipt</a> <a target='_blank' href='bill.html?invoice=${invoice.invoice_code}' class='btn btn-success btn-sm'>Print Bill</a></td>`;
+                    tableBody.appendChild(groupHeaderRow);
+                    lastInvoiceCode = invoice.invoice_code;
+                }
+
+                // Iterate over each line item and accumulate totals
+                invoice.invoice_lines.forEach(line => {
+                    totalPrice += Number(line.price);
+                    totalQuantity += Number(line.qty);
+                    totalDiscount += Number(line.disc);
+                    totalNet += Number(line.net);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${invoice.invoice_code}</td>
+                        <td>${formatDateTime(invoice.invoice_date)}</td>
+                        <td>${invoice.payment_mode}</td>
+                        <td>${invoice.customer || ''}</td>
+                        <td>${line.itemName}</td>
+                        <td class='amount'>${formatNumberWithCommas(line.price)}</td>
+                        <td>${parseInt(line.qty, 10)}</td>
+                        <td class='amount'>${formatNumberWithCommas(line.disc)}</td>
+                        <td class='amount'>${formatNumberWithCommas(line.net)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Add a summary row for each invoice group
+                const summaryRow = document.createElement('tr');
+                summaryRow.classList.add('invoice-summary');
+                summaryRow.innerHTML = `
+                    <td colspan="5">Total for Invoice Code: ${invoice.invoice_code}</td>
+                    <td class='amount'>${formatNumberWithCommas(totalPrice)}</td>
+                    <td>${totalQuantity}</td>
+                    <td class='amount'>${formatNumberWithCommas(totalDiscount)}</td>
+                    <td class='amount'>${formatNumberWithCommas(totalNet)}</td>
                 `;
-                tableBody.appendChild(groupHeaderRow);
-                lastInvoiceCode = invoice.invoice_code;
-            }
+                tableBody.appendChild(summaryRow);
+            });
+        });
+    }
 
-            // Iterate over each line item and accumulate totals
+    function exportFilteredToExcel() {
+        // Create a new table for filtered data
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+        
+        thead.innerHTML = `
+            <tr>
+                <th>Invoice Code</th>
+                <th>Date & Time</th>
+                <th>Payment</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Discount</th>
+                <th>Net</th>
+            </tr>
+        `;
+        table.appendChild(thead);
+
+        filteredInvoices.forEach(invoice => {
             invoice.invoice_lines.forEach(line => {
-                totalPrice += Number(line.price);
-                totalQuantity += Number(line.qty);
-                totalDiscount += Number(line.disc);
-                totalNet += Number(line.net);
-
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${invoice.invoice_code}</td>
@@ -121,56 +175,25 @@
                     <td>${invoice.payment_mode}</td>
                     <td>${invoice.customer || ''}</td>
                     <td>${line.itemName}</td>
-                    <td class='amount'>${formatNumberWithCommas(line.price)}</td>
-                    <td>${parseInt(line.qty, 10)}</td> <!-- Remove leading zeros from quantity -->
-                    <td class='amount'>${formatNumberWithCommas(line.disc)}</td>
-                    <td class='amount'>${formatNumberWithCommas(line.net)}</td>
+                    <td>${formatNumberWithCommas(line.price)}</td>
+                    <td>${parseInt(line.qty, 10)}</td>
+                    <td>${formatNumberWithCommas(line.disc)}</td>
+                    <td>${formatNumberWithCommas(line.net)}</td>
                 `;
-                tableBody.appendChild(row);
+                tbody.appendChild(row);
             });
-
-            // Add a summary row for each invoice group
-            const summaryRow = document.createElement('tr');
-            summaryRow.classList.add('invoice-summary');
-            summaryRow.innerHTML = `
-                <td colspan="5">Total for Invoice Code: ${invoice.invoice_code}</td>
-                <td class='amount'>${formatNumberWithCommas(totalPrice)}</td>
-                <td>${totalQuantity}</td>
-                <td class='amount'>${formatNumberWithCommas(totalDiscount)}</td>
-                <td class='amount'>${formatNumberWithCommas(totalNet)}</td>
-            `;
-            tableBody.appendChild(summaryRow);
         });
-    });
 
-    function exportToExcel(tableID, filename = '') {
-        const d = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '-');
-        filename = 'saimtech_invoices_data_' + d;
-        var table = document.getElementById(tableID);
-        var workbook = XLSX.utils.table_to_book(table, { sheet: "Invoices Data" });
-        var wopts = { bookType: 'xlsx', bookSST: true, type: 'binary' };
+        table.appendChild(tbody);
 
-        var wbout = XLSX.write(workbook, wopts);
-
-        function s2ab(s) {
-            var buf = new ArrayBuffer(s.length);
-            var view = new Uint8Array(buf);
-            for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-            return buf;
-        }
-
-        var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-
-        var link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = filename ? filename + '.xlsx' : 'saimtech_open_pos_invoice_data.xlsx';
-
-        document.body.appendChild(link);
-
-        link.click();
-
-        document.body.removeChild(link);
+        // Export filtered data
+        const workbook = XLSX.utils.table_to_book(table, { sheet: "Filtered Invoices" });
+        const filename = `filtered_invoices_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, filename);
     }
+
+    // Initial load of invoices (unfiltered)
+    filterInvoices();
 </script>
 <script src="js/popperjs.js"></script>
 <script src="js/bootstrap.min.js"></script>
