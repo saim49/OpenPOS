@@ -3,6 +3,8 @@
 <title> Order confirmation </title>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
+
+<script src="js/jquery-3.7.1.min.js"></script>
 <style type="text/css">
   @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
   body { margin: 0; padding: 0; background: #e1e1e1; }
@@ -33,7 +35,75 @@
   .hiddenMobile { display: none !important; }
   }
 </style>
+<script>
+$( document ).ready(function(){
+     
+  function formatNumberWithCommas(number) {
+    return  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");;
+  }
 
+  const searchParams  = new URLSearchParams(window.location.search);
+  const d             = new Date().toLocaleString().replace(',','');
+  const invoice       = searchParams.get('invoice');
+  const hostName      = localStorage.getItem('hostName');
+  const invoicesData  = JSON.parse(localStorage.getItem('invoicesData'));
+  var shopName        = "Atta Son's (SaimTech)";
+  var shopDetail      = "A truely pakistani tech brand.";
+  
+  if (localStorage.getItem('shopName'))
+  {
+      shopName        = localStorage.getItem('shopName');
+  }
+  
+  if (localStorage.getItem('shopDetail'))
+  {
+      shopDetail      = localStorage.getItem('shopDetail');
+  }
+  debugger;
+  $('#invoice-span').text(invoice);
+  for (let i = 0; i <= invoicesData.length; i++) 
+{
+     var innerArrayData = invoicesData[i];
+     for (let i= 0; i < innerArrayData.length; i++) 
+  {
+          if (innerArrayData[i].invoice_code == invoice) 
+    {
+            $('#total-amount').text(formatNumberWithCommas(innerArrayData[i].invoice_total)); 
+            $('#discount-amount').text(formatNumberWithCommas(innerArrayData[i].invoice_discount)); 
+            $('#net-amount').text(formatNumberWithCommas(innerArrayData[i].invoice_net)); 
+            $('#paym-span').text(innerArrayData[i].payment_mode); 
+            $('#customer-span').text(innerArrayData[i].customer);
+            $('#date-span').text(d);
+            $('#shop-name-span').text(shopName);
+            $('#shop-name-span-ci').text(shopName);
+            $('#shop-detail-span').text(shopDetail); 
+            
+            var v_cell1,v_cell2,v_cell3,v_cell4,v_row,v_rowNum, 
+            v_table;
+            //-------
+            $("#bill-table-body").html("");
+            v_html = "";
+            //-------
+            $.each(innerArrayData[i].invoice_lines, function(j, rows) {
+                v_rowNum 		= j+1;
+                v_html += "<tr>";
+                v_html += `<td style='font-size: 12px; font-family: "Open Sans", sans-serif; color: #5b5b5b; line-height: 18px;  vertical-align: top;'>`+rows.itemName+`</td>`;
+                v_html += `<th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center">`+rows.qty+`</td>`;
+                v_html += `<th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center" class='amount'>`+formatNumberWithCommas(rows.price)+`</td>`;
+                v_html += `<th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center" class='amount'>`+formatNumberWithCommas(rows.disc)+`</td>`;
+                v_html += `<th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center" class='amount'>`+formatNumberWithCommas((Number(rows.qty) * Number(rows.price)) - Number(rows.disc))+`</td>`;
+                v_html += "</tr>";
+  
+            });
+            $("#bill-table-body").html(v_html);
+            break;
+          }
+      }
+   }
+  
+
+});	
+</script>
 
 <!-- Header -->
 <table width="100%" border="0" cellpadding="0" cellspacing="0" align="center" class="fullTable" bgcolor="#e1e1e1">
@@ -59,7 +129,7 @@
                     <table width="220" border="0" cellpadding="0" cellspacing="0" align="left" class="col">
                       <tbody>
                         <tr>
-                          <td align="left"> <img src="http://www.supah.it/dribbble/017/logo.png" width="32" height="32" alt="logo" border="0" /></td>
+                          <td align="left"><span style="font-size: 21px; color: #222121; letter-spacing: -1px; font-family: 'Open Sans', sans-serif; line-height: 1; vertical-align: top; text-align: left;" id="shop-name-span"></span></td>
                         </tr>
                         <tr class="hiddenMobile">
                           <td height="40"></td>
@@ -69,8 +139,8 @@
                         </tr>
                         <tr>
                           <td style="font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: left;">
-                            Hello, Philip Brooks.
-                            <br> Thank you for shopping from our store and for your order.
+                            Hello, <span id="customer-span"></span>
+                            <br> Thank you for shopping from us and for your order.
                           </td>
                         </tr>
                       </tbody>
@@ -84,7 +154,7 @@
                           <td height="5"></td>
                         </tr>
                         <tr>
-                          <td style="font-size: 21px; color: #ff0000; letter-spacing: -1px; font-family: 'Open Sans', sans-serif; line-height: 1; vertical-align: top; text-align: right;">
+                          <td style="font-size: 21px; color: #222121; letter-spacing: -1px; font-family: 'Open Sans', sans-serif; line-height: 1; vertical-align: top; text-align: right;">
                             Invoice
                           </td>
                         </tr>
@@ -97,8 +167,8 @@
                         </tr>
                         <tr>
                           <td style="font-size: 12px; color: #5b5b5b; font-family: 'Open Sans', sans-serif; line-height: 18px; vertical-align: top; text-align: right;">
-                            <small>ORDER</small> #800000025<br />
-                            <small>MARCH 4TH 2016</small>
+                            <small>Order</small> <span id="invoice-span"></span><br />
+                            <small id="date-span"></small>
                           </td>
                         </tr>
                       </tbody>
@@ -131,48 +201,30 @@
             <tr>
               <td>
                 <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
-                  <tbody>
                     <tr>
-                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 10px 7px 0;" width="52%" align="left">
+                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight:bolder; line-height: 1; vertical-align: top; padding: 0 10px 7px 0;" width="52%" align="left">
                         Item
                       </th>
-                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="left">
-                        <small>SKU</small>
-                      </th>
-                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center">
+                      
+                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: bolder; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center">
                         Quantity
                       </th>
-                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33; font-weight: normal; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="right">
-                        Subtotal
+                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; font-weight: bolder; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="center">
+                        Rate
+                      </th>
+                      
+                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33; font-weight: bolder; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="right">
+                        Discount
+                      </th>
+                      
+                      <th style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33; font-weight: bolder; line-height: 1; vertical-align: top; padding: 0 0 7px;" align="right">
+                        Total
                       </th>
                     </tr>
-                    <tr>
-                      <td height="1" style="background: #bebebe;" colspan="4"></td>
-                    </tr>
-                    <tr>
-                      <td height="10" colspan="4"></td>
-                    </tr>
-                    <tr>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #ff0000;  line-height: 18px;  vertical-align: top; padding:10px 0;" class="article">
-                        Beats Studio Over-Ear Headphones
-                      </td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e;  line-height: 18px;  vertical-align: top; padding:10px 0;"><small>MH792AM/A</small></td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e;  line-height: 18px;  vertical-align: top; padding:10px 0;" align="center">1</td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33;  line-height: 18px;  vertical-align: top; padding:10px 0;" align="right">$299.95</td>
-                    </tr>
-                    <tr>
-                      <td height="1" colspan="4" style="border-bottom:1px solid #e4e4e4"></td>
-                    </tr>
-                    <tr>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #ff0000;  line-height: 18px;  vertical-align: top; padding:10px 0;" class="article">Beats RemoteTalk Cable</td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e;  line-height: 18px;  vertical-align: top; padding:10px 0;"><small>MHDV2G/A</small></td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e;  line-height: 18px;  vertical-align: top; padding:10px 0;" align="center">1</td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #1e2b33;  line-height: 18px;  vertical-align: top; padding:10px 0;" align="right">$29.95</td>
-                    </tr>
-                    <tr>
-                      <td height="1" colspan="4" style="border-bottom:1px solid #e4e4e4"></td>
-                    </tr>
-                  </tbody>
+                    <tbody id="bill-table-body">
+
+                    </tbody>
+               
                 </table>
               </td>
             </tr>
@@ -201,32 +253,26 @@
                   <tbody>
                     <tr>
                       <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ">
-                        Subtotal
+                         Total amount
                       </td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; white-space:nowrap;" width="80">
-                        $329.90
+                      <td id="total-amount" style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; white-space:nowrap;" width="80">
+                       
                       </td>
                     </tr>
                     <tr>
                       <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ">
-                        Shipping &amp; Handling
+                        Total discount
                       </td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ">
-                        $15.00
+                      <td id="discount-amount" style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #646a6e; line-height: 22px; vertical-align: top; text-align:right; ">
+                        
                       </td>
                     </tr>
                     <tr>
                       <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #000; line-height: 22px; vertical-align: top; text-align:right; ">
-                        <strong>Grand Total (Incl.Tax)</strong>
+                        <strong>Net amount to be paid</strong>
                       </td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #000; line-height: 22px; vertical-align: top; text-align:right; ">
-                        <strong>$344.90</strong>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #b0b0b0; line-height: 22px; vertical-align: top; text-align:right; "><small>TAX</small></td>
-                      <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #b0b0b0; line-height: 22px; vertical-align: top; text-align:right; ">
-                        <small>$72.40</small>
+                      <td   style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #000; line-height: 22px; vertical-align: top; text-align:right; ">
+                        <strong id="net-amount"></strong>
                       </td>
                     </tr>
                   </tbody>
@@ -267,7 +313,7 @@
                           <tbody>
                             <tr>
                               <td style="font-size: 11px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 1; vertical-align: top; ">
-                                <strong>BILLING INFORMATION</strong>
+                                <strong>Company Information</strong>
                               </td>
                             </tr>
                             <tr>
@@ -275,7 +321,9 @@
                             </tr>
                             <tr>
                               <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 20px; vertical-align: top; ">
-                                Philip Brooks<br> Public Wales, Somewhere<br> New York NY<br> 4468, United States<br> T: 202-555-0133
+                                <span id="shop-name-span-ci"></span>
+                                <br>
+                                <span id="shop-detail-span"></span>
                               </td>
                             </tr>
                           </tbody>
@@ -289,7 +337,7 @@
                             </tr>
                             <tr>
                               <td style="font-size: 11px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 1; vertical-align: top; ">
-                                <strong>PAYMENT METHOD</strong>
+                                <strong>Payment method</strong>
                               </td>
                             </tr>
                             <tr>
@@ -297,68 +345,7 @@
                             </tr>
                             <tr>
                               <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 20px; vertical-align: top; ">
-                                Credit Card<br> Credit Card Type: Visa<br> Worldpay Transaction ID: <a href="#" style="color: #ff0000; text-decoration:underline;">4185939336</a><br>
-                                <a href="#" style="color:#b0b0b0;">Right of Withdrawal</a>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <table width="480" border="0" cellpadding="0" cellspacing="0" align="center" class="fullPadding">
-                  <tbody>
-                    <tr>
-                      <td>
-                        <table width="220" border="0" cellpadding="0" cellspacing="0" align="left" class="col">
-                          <tbody>
-                            <tr class="hiddenMobile">
-                              <td height="35"></td>
-                            </tr>
-                            <tr class="visibleMobile">
-                              <td height="20"></td>
-                            </tr>
-                            <tr>
-                              <td style="font-size: 11px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 1; vertical-align: top; ">
-                                <strong>SHIPPING INFORMATION</strong>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td width="100%" height="10"></td>
-                            </tr>
-                            <tr>
-                              <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 20px; vertical-align: top; ">
-                                Sup Inc<br> Another Place, Somewhere<br> New York NY<br> 4468, United States<br> T: 202-555-0171
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-
-
-                        <table width="220" border="0" cellpadding="0" cellspacing="0" align="right" class="col">
-                          <tbody>
-                            <tr class="hiddenMobile">
-                              <td height="35"></td>
-                            </tr>
-                            <tr class="visibleMobile">
-                              <td height="20"></td>
-                            </tr>
-                            <tr>
-                              <td style="font-size: 11px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 1; vertical-align: top; ">
-                                <strong>SHIPPING METHOD</strong>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td width="100%" height="10"></td>
-                            </tr>
-                            <tr>
-                              <td style="font-size: 12px; font-family: 'Open Sans', sans-serif; color: #5b5b5b; line-height: 20px; vertical-align: top; ">
-                                UPS: U.S. Shipping Services
+                                <span id="paym-span"></span>
                               </td>
                             </tr>
                           </tbody>
