@@ -22,6 +22,7 @@
 </head>
 <body>
 <div class="table-responsive">
+    <button class="btn btn-success btn-sm" onclick="exportFilteredToExcel()">Export Filtered Data to Excel</button>
     <center>
         <div>
             <label for="startDate">Start Date: </label>
@@ -30,8 +31,7 @@
             <input type="date" id="endDate" onchange="filterInvoices()">
         </div>
         <br>
-        <button class="btn btn-success btn-sm" onclick="exportFilteredToExcel()">Export Filtered Data to Excel</button>
-
+        
         <table id="invoiceTable" class="table2">
             <thead>
                 <tr>
