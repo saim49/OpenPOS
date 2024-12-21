@@ -9,16 +9,14 @@ var 	g_editErrorFlag = 0;
 var		g_loader = `<div class="spinner-border text-light font-size-sm" role="status"><span class="visually-hidden">Loading...</span></div>`; 	
 var		g_logo_dark = `<img src="icons/saimtech-white.png" width="600px">`; 	
 var		g_logo_light = `<img src="icons/saimtech-black.png" width="600px">`; 	
-var     g_itemNameList = [];
 var     g_itemIdCounter = 0;
 var 	endpoint = "https://logisticasaan365.com/poslite/api/";
+var 	g_itemOptionHTML = "";
 
 
-if (localStorage.getItem('itemNameList'))
-{
-    g_itemNameList = localStorage.getItem('itemNameList');
+function formatNumberWithCommas(number) {
+    return  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");;
 }
-
 
 function exportData()
 {
@@ -26,10 +24,6 @@ function exportData()
 	
 	if (document.getElementById('exportItems').checked) {
 		jsonData['items'] = localStorage.getItem('items') ? localStorage.getItem('items') : null;
-	}
-
-	if (document.getElementById('exportInvoices').checked) {
-		jsonData['invoicesData'] = localStorage.getItem('invoicesData') ? localStorage.getItem('invoicesData') : null;
 	}
 
 	if (document.getElementById('exportPrintSettings').checked) {
@@ -91,10 +85,6 @@ function importData()
 		
 		if (jsonData.hasOwnProperty('items') && jsonData.items !== undefined) {
 			localStorage.setItem('items', jsonData.items); // Use JSON.stringify for objects or arrays
-		}
-		
-		if (jsonData.hasOwnProperty('invoicesData') && jsonData.invoicesData !== undefined) {
-			localStorage.setItem('invoicesData', jsonData.invoicesData); // Use JSON.stringify for objects or arrays
 		}
 		
 		if (jsonData.hasOwnProperty('theme') && jsonData.theme !== undefined) {
@@ -236,9 +226,20 @@ function popup(_title, _msg)
 		title: _title,
 		text: _msg,
 		confirmButtonColor: "#198753",
+		
 	});
 }
 
+function popup_html(_title, _html)
+{
+	Swal.fire({
+		title: _title,
+		html: _html,
+		width: 900,
+		confirmButtonColor: "#198753",
+		showConfirmButton: false,
+  	});
+}
 //Author: Muhammad Saim
 //Method: getUniqueCode
 function getUniqueCode()
@@ -381,6 +382,7 @@ function simpleSaveBillLine()
 		loc_newBillLineObj['qty'] 		= v_qty;
 		loc_newBillLineObj['disc'] 		= v_disc;
 		loc_newBillLineObj['net'] 		= v_net;
+		loc_newBillLineObj['ret_qty'] 	= 0;
 		loc_newBillLineObj['discPer']   = parseFloat(v_disc_per).toFixed(2);
 		
 		//-------
@@ -395,7 +397,8 @@ function simpleSaveBillLine()
 		        g_newBillLine[i].price		= v_price;
 			    g_newBillLine[i].net 		= (Number(g_newBillLine[i].qty) * Number(g_newBillLine[i].price))-(Number(g_newBillLine[i].disc) + Number(loc_newBillLineObj['disc']));
 			    g_newBillLine[i].disc		= (Number(g_newBillLine[i].disc) + Number(loc_newBillLineObj['disc']));
-    		    v_disc_per                  = ((parseFloat(g_newBillLine[i].disc) / (parseFloat(g_newBillLine[i].price) * parseInt(g_newBillLine[i].qty)))*100);
+				g_newBillLine[i].ret_qty	= 0;
+				v_disc_per                  = ((parseFloat(g_newBillLine[i].disc) / (parseFloat(g_newBillLine[i].price) * parseInt(g_newBillLine[i].qty)))*100);
     		    g_newBillLine[i].discPer    = parseFloat(v_disc_per).toFixed(2);
     		    loc_newBillLineObj['qty'] 	= g_newBillLine[i].qty;
     		    v_updated 					= 1;
@@ -454,6 +457,11 @@ function simpleDrawBillLineTable()
   updateTotalBlock();
 }
 
+//Author: Muhammad Saim
+//Method: refresh page
+function refreshPage() {
+	location.reload();  // This will refresh the page
+}
 
 //Author: Muhammad Saim
 //Method: update date and time
@@ -470,6 +478,7 @@ function createSimpleBill()
 {
 	const date = new Date();
 	var v_newBillData = {};
+	var v_newBillLineData = {};
 	var v_previousBillData = [];
 	var v_previousBillDataArray = [];
 	var v_uniqueCode = g_uniqueCode;
@@ -477,40 +486,41 @@ function createSimpleBill()
 
 	if (g_editErrorFlag==0 && g_newBillLine.length>0)
 	{
-		v_newBillData['invoice_code']		= g_uniqueCode;
-		v_newBillData['counter_name']		= localStorage.getItem("hostName");
-		v_newBillData['user_id']			= g_uniqueCode;
-		v_newBillData['invoice_date']		= date.getFullYear()+"-"+Number(parseInt(date.getMonth())+parseInt(1))+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
-		v_newBillData['invoice_total']		= $('#li-total-amount').text();
-		v_newBillData['invoice_discount']	= $('#li-discount-amount').text();
-		v_newBillData['invoice_net']		= $('#li-net-amount').text();
-		v_newBillData['payment_mode']		= $('#li-payment-mode').val();
-		v_newBillData['customer'] 		    = $('#li-customer-data').val();
-		v_newBillData['invoice_lines'] 		= g_newBillLine;
+		v_newBillData['invoice_code']				= g_uniqueCode;
+		v_newBillData['counter_name']				= localStorage.getItem("hostName");
+		v_newBillData['user_id']					= g_uniqueCode;
+		v_newBillData['invoice_date']				= date.getFullYear()+"-"+Number(parseInt(date.getMonth())+parseInt(1))+"-"+date.getDate();
+		v_newBillData['invoice_date_time']			= date.getFullYear()+"-"+Number(parseInt(date.getMonth())+parseInt(1))+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+		v_newBillData['invoice_total']				= $('#li-total-amount').text();
+		v_newBillData['invoice_discount']			= $('#li-discount-amount').text();
+		v_newBillData['invoice_net']				= $('#li-net-amount').text();
+		v_newBillData['payment_mode']				= $('#li-payment-mode').val();
+		v_newBillData['customer'] 		    		= $('#li-customer-data').val();
+		v_newBillData['invoice_lines'] 				= g_newBillLine;
+		v_newBillData['invoice_return']				= 0;
+		v_newBillData['invoice_return_total']		= 0;
+		v_newBillData['invoice_return_discount']	= 0;
+		v_newBillData['invoice_return_net']			= 0;
 		
-
-		if (localStorage.getItem("invoicesData"))
-		{
-			v_previousBillData = JSON.parse(localStorage.getItem("invoicesData"));
-			for (let i = 0; i < v_previousBillData.length; i++) 
-			{	
-				v_previousBillDataArray.push($.makeArray(v_previousBillData[i]));
-			}
-			v_previousBillDataArray.push($.makeArray(v_newBillData));
-			localStorage.setItem("invoicesData", JSON.stringify(v_previousBillDataArray));	
-		}
-		else
-		{
-			localStorage.setItem("invoicesData",JSON.stringify($.makeArray(v_newBillData)));	
+		addItem(v_newBillData);
+		
+		for (let key in g_newBillLine) 
+		{ 
+			v_newBillLineData = g_newBillLine[key];
+			v_newBillLineData.invoice_date = v_newBillData['invoice_date'];
+			v_newBillLineData.invoice_code = g_uniqueCode;
+			addLineItem(v_newBillLineData);
 		}
 
+		localStorage.setItem("invoicesData", JSON.stringify(v_newBillData));
 		g_newBillLine = [];
+
 		getUniqueCode();
 		$('#li-total-amount').html(Number(0));
 		$('#li-discount-amount').html(Number(0));
 		$('#li-net-amount').html(Number(0));
 		simpleDrawBillLineTable();
-		window.open("print.html?invoice="+v_uniqueCode+"","MsgWindow", "width=800,height=500");
+		window.open("print.html","MsgWindow", "width=800,height=500");
 	}
 	else
 	{
@@ -547,7 +557,7 @@ function calLineDisAmtAndPer(_itemId,_price,_qty,_disPer,_disAmt,_flag)
 //Method: calculate edit simple line net
 function editSimpleBillLineNet(_itemId,_flag)
 {
-    debugger;
+    
 	var v_net; 
 	var v_price				= $( "#price-"+_itemId ).val();
 	g_editErrorFlag 		= 0;
@@ -594,6 +604,8 @@ function saveShopDetail()
         localStorage.setItem('shopDetail', shopDetail); 
         $("#shop-detail").val(localStorage.getItem('shopDetail'));
     }
+
+	popup('Print Setting','Print settings are saved successfully');
     
 }
 
