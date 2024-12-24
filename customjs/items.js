@@ -236,6 +236,10 @@ function saveNewInventory()
 
 function updateQuantityTable()
 {
+    $('#t-purchaseQunatity').html('<center><mark><b>0</b></mark></b>');
+    $('#t-qunatity').html('<center><mark><b>0</b></mark></b>');
+    $('#t-saleQunatity').html('<center><mark><b>0</b></mark></b>');
+                            
     const itemName = document.getElementById('itemDropdown').value.trim();
     var v_sumTotalSaleQuantity = 0;
     var v_sumTotalPurchaseQuantity = 0;
